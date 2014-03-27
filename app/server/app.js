@@ -6,6 +6,52 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var os = require('os');
+var io = require('socket.io').listen(8984);
+
+// send minified client
+io.enable('browser client minification');
+// apply etag caching logic based on version number
+io.enable('browser client etag');
+// gzip the file
+io.enable('browser client gzip');
+// reduce logging
+io.set('log level', 1);
+// color the log
+io.set('log colors', true);
+// close timeout
+io.set('close timeout', 60);
+// heartbeat timeout
+io.set('heartbeat timeout', 60);
+// heartbeat interval
+io.set('heartbeat interval', 30);
+// enable all transports
+io.set('transports', ['websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']);
+
+var monitor = io
+    .of('/monitor')
+    .on('connection', function(socket) {
+        socket.on('get', function (data, cb) {
+            console.log(data);
+            var opts = {
+                hostname: 'graphite.torjus',
+                port: 80,
+                path: '/render?' + data
+            };
+
+            var req = http.get(opts, function (res) {
+                var data = '';
+                res.on('data', function (chunk) {
+                    data += chunk;
+                }).on('end', function () {
+                    cb(data);
+                });
+            });
+            //callback(process.memoryUsage());
+            //console.log(util.inspect(process.memoryUsage()));
+        });
+    });
+
 var routes = require('./routes');
 var users = require('./routes/user');
 

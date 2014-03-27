@@ -12,6 +12,10 @@ angular.module('varnishMonApp', [
                 templateUrl: 'views/main.html',
                 controller: 'MainCtrl'
             })
+            .when('/hitmiss', {
+                templateUrl: 'views/hitmiss.html',
+                controller: 'HitMiss'
+            })
             .when('/about', {
                 templateUrl: 'views/about.html',
                 controller: 'MainCtrl'
