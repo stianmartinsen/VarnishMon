@@ -51,9 +51,13 @@ module.exports = function (grunt) {
                 },
                 files: [
                     '<%= yeoman.app %>/{,*/}*.html',
-                    '.tmp/styles/{,*/}*.css',
+                    'app/css/app.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
+            },
+            sass: {
+                files: 'app/scss/*.scss',
+                tasks: ['sass']
             }
         },
 
@@ -147,9 +151,27 @@ module.exports = function (grunt) {
             }
         },
 
-
-
-
+        sass: {
+            dist: {
+                options: {
+                    outputStyle: 'compressed',
+                    sourceComments: 'none'
+                },
+                files: {
+                }
+            },
+            dev: {
+                options: {
+                    outputStyle: 'expanded',
+                    sourceComments: 'map',
+                    sourceMap: 'app.css.map',
+                    includePaths: ['app/bower_components/sass-bootstrap/lib/']
+                },
+                files: {
+                    'app/css/app.css': 'app/scss/app.scss'
+                }
+            }
+        },
 
         // Renames files for browser caching purposes
         rev: {
@@ -324,6 +346,8 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-sass');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
@@ -371,8 +395,10 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('default', [
-        'newer:jshint',
-        'test',
-        'build'
+        //'newer:jshint',
+        //'test',
+        'sass:dev',
+        'watch'
+        //'build'
     ]);
 };
