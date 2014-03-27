@@ -1,0 +1,9 @@
+.main-container {
+    margin-bottom: 2em;
+}
+
+dl {
+  dd + dt {
+    margin-top: 1em;
+  }
+}
