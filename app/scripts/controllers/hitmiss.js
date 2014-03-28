@@ -5,7 +5,7 @@ angular.module('varnishMonApp')
         $scope.selectedTimeIndex = $scope.selectedTimeIndex || 1;
 
         $scope.times = [
-            {'name': '1 minute', 'min': 1},
+            {'name': '2 minutes', 'min': 2},
             {'name': '5 minutes', 'min': 5},
             {'name': '10 minutes', 'min': 10},
             {'name': '30 minutes', 'min': 30},
@@ -105,7 +105,10 @@ angular.module('varnishMonApp')
                             },
                             axis: {
                                 x: {
-                                    type: 'timeseries'
+                                    type: 'timeseries',
+                                },
+                                y: {
+                                    label: 'Requests pr second'
                                 }
                             }
                         });

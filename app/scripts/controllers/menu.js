@@ -4,7 +4,7 @@ angular.module('varnishMonApp')
     .controller('Menu', function ($scope, $location) {
         $scope.location = $location;
         $scope.links = [
-            {name: 'Hit rate', url: '#/hitmiss'},
+            {name: 'Hit/miss', url: '#/hitmiss'},
             {name: 'Status', url: '#/status'},
             {name: 'Ban', url: '#/ban'},
             {name: 'About', url: '#/about'},
