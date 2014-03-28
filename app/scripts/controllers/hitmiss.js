@@ -11,7 +11,8 @@ angular.module('varnishMonApp')
             {'name': '30 minutes', 'min': 30},
             {'name': '2 hours', 'min': 120},
             {'name': '6 hours', 'min': 360},
-            {'name': '12 hours', 'min': 720}
+            {'name': '12 hours', 'min': 720},
+            {'name': '24 hours', 'min': 1440}
         ];
 
         function createGauge(name, label, min, max) {
@@ -63,19 +64,28 @@ angular.module('varnishMonApp')
             graph,
             updateGraph = function () {
                 var minutes = $scope.times[$scope.selectedTimeIndex].min,
-                    q = 'from=-' + minutes + 'minutes&until=now&format=json&target=stats.miss&target=stats.hit&xFormat=%H:%M:%S'
+                    q = 'stats.miss&target=stats.hit';
                 ;
 
-                socket.of('/monitor').emit('get', q, function (res) {
+                if (minutes >= 120) {
+                    q = 'summarize(stats.miss,"10min")&target=summarize(stats.hit,"10min")';
+                }
+
+                if (minutes >= 360) {
+                    q = 'summarize(stats.miss,"60min")&target=summarize(stats.hit,"60min")';
+                }
+
+                socket.of('/monitor').emit('get', 'from=-' + minutes + 'minutes&format=json&target=' + q, function (res) {
+                    console.log(res);
                     var data = JSON.parse(res),
                         miss = data[0],
-                        hit = data[1];
-
-                    var arr = [
-                        ['date'],
-                        ['hit'],
-                        ['miss']
-                    ];
+                        hit = data[1],
+                        totalHits = data[2],
+                        arr = [
+                            ['date'],
+                            ['hit'],
+                            ['miss']
+                        ];
 
                     for (var i = 0; i < hit.datapoints.length; i++) {
                         var date = new Date();
