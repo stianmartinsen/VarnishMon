@@ -1,7 +1,19 @@
 'use strict';
 
 angular.module('varnishMonApp')
-    .controller('HitMiss', function ($scope, SocketService, GaugeService) {
+    .controller('HitMiss', function ($scope, $timeout, SocketService, GaugeService) {
+        $scope.selectedTimeIndex = $scope.selectedTimeIndex || 1;
+
+        $scope.times = [
+            {'name': '1 minute', 'min': 1},
+            {'name': '5 minutes', 'min': 5},
+            {'name': '10 minutes', 'min': 10},
+            {'name': '30 minutes', 'min': 30},
+            {'name': '2 hours', 'min': 120},
+            {'name': '6 hours', 'min': 360},
+            {'name': '12 hours', 'min': 720}
+        ];
+
         function createGauge(name, label, min, max) {
             var config = {
                 size: 200,
@@ -28,30 +40,29 @@ angular.module('varnishMonApp')
         }
 
         var socket = SocketService.socket;
-
-        var total = function (dataset) {
-            var sum = 0;
-
-            for (var i of dataset) {
-                sum += i[0];
-            }
-
-            return sum;
-        };
-
         var hitMissGauge = createGauge('hitmiss', 'Hit rate');
 
-        var hitVsMiss = function (hit, miss) {
-            var totalHit = total(hit.datapoints),
-                totalMiss = total(miss.datapoints);
+        var updateGaugePromise,
+            updateGauge = function () {
+            var minutes = $scope.times[$scope.selectedTimeIndex].min,
+                q = 'asPercent(summarize(stats.hit,"' + minutes + 'min","sum",true),summarize(stats.totalHits,"' + minutes + 'min","sum",true))'
+            ;
+            console.log(minutes);
 
-            hitMissGauge.redraw((totalHit / (totalHit + totalMiss) * 100) || 0);
+            socket.of('/monitor').emit('get', 'from=-' + minutes + 'minutes&format=json&target=' + q, function (res) {
+
+                var data = JSON.parse(res);
+                hitMissGauge.redraw(data[0].datapoints[0][0] || 0);
+            });
+            updateGaugePromise = $timeout(updateGauge, 1000);
         };
 
-        setInterval(function () {
-            socket.of('/monitor').emit('get', 'from=-10minutes&until=now&target=stats.hit&target=stats.miss&format=json', function (res) {
-                var data = JSON.parse(res);
-                hitVsMiss(data[0], data[1]);
-            });
-        }, 3000);
+        updateGauge();
+
+        $scope.$on(
+            "$destroy",
+            function( event ) {
+                $timeout.cancel(updateGaugePromise);
+            }
+        );
     });

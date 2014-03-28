@@ -1,5 +1,17 @@
+.navbar {
+    margin-bottom: 2em;
+}
+
 .main-container {
     margin-bottom: 2em;
+
+    .page-header {
+        margin-top: 0;
+
+        h1 {
+            margin-top: 0;
+        }
+    }
 }
 
 dl {

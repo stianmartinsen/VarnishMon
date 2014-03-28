@@ -1,1 +1,7 @@
-<span id="hitmissGaugeContainer"></span>
+<article class="hitrate">
+    <div class="range">
+        <label for="hitMissRange">Time: {{ times[selectedTimeIndex].name }}</label>
+        <input type=range min=0 max={{times.length-1}} id="hitMissRange" ng-model="selectedTimeIndex">
+    </div>
+    <span id="hitmissGaugeContainer"></span>
+</article>
