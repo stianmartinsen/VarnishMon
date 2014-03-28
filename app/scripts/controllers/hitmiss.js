@@ -76,7 +76,6 @@ angular.module('varnishMonApp')
                 }
 
                 socket.of('/monitor').emit('get', 'from=-' + minutes + 'minutes&format=json&target=' + q, function (res) {
-                    console.log(res);
                     var data = JSON.parse(res),
                         miss = data[0],
                         hit = data[1],
