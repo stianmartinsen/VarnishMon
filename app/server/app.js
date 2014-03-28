@@ -56,6 +56,7 @@ var varnish = net.createConnection({
 });
 var ATTEMPT_RECONNECT = false;
 var broadcastState = function (state) {};
+var handleVarnishResp = function () {};
 
 var reconnect = function () {
     var interval = setInterval(function () {
@@ -90,33 +91,37 @@ varnish
             reconnect();
         }
     })
+    .on('data', function (data) {
+        console.log(data.toString());
+        handleVarnishResp && handleVarnishResp(data.toString());
+    })
 ;
 
 io.of('/varnish').on('connection', function (socket) {
-    var cb;
-
     broadcastState = function (state) {
         socket.emit(state);
     };
 
-    varnish.on('data', function (data) {
-        cb && cb(data.toString());
-    });
-
-    socket.on('ban', function (match, call) {
-        if (varnish._handle) {
-            cb = call;
-            varnish.write('ban ' + match + "\n", 'utf8');
-        }
-    })
-    .on('update_status', function () {
-        broadcastState(ATTEMPT_RECONNECT ? 'down' : 'up');
-    })
-    .on('end', function () {
-        console.log('Varnish socket disconnected. Attempting reconnect');
-        console.log('error %j', arguments);
-        varnish.connect();
-    });
+    socket
+        .on('ban', function (match, call) {
+            if (varnish._handle) {
+                handleVarnishResp = call;
+                varnish.write('ban ' + match + "\n", 'utf8');
+            }
+        })
+        .on('cmd', function (cmd, call) {
+            handleVarnishResp = call;
+            varnish.write(cmd + "\n");
+        })
+        .on('update_status', function () {
+            broadcastState(ATTEMPT_RECONNECT ? 'down' : 'up');
+        })
+        .on('end', function () {
+            console.log('Varnish socket disconnected. Attempting reconnect');
+            console.log('error %j', arguments);
+            varnish.connect();
+        })
+    ;
 });
 
 var routes = require('./routes');

@@ -1,0 +1,18 @@
+<article ng-controller="Configure" class="configure">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Option</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tr ng-repeat="line in config">
+            <td>
+                <code>{{ line[0] }}</code>
+            </td>
+            <td>
+                <code>{{ line[1] }}</code>
+            </td>
+        </tr>
+    </table>
+</article>

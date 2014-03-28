@@ -7,6 +7,7 @@ angular.module('varnishMonApp')
             {name: 'Hit/miss', url: '#/hitmiss'},
             {name: 'Status', url: '#/status'},
             {name: 'Ban', url: '#/ban'},
+            {name: 'Configure', url: '#/configure'},
             {name: 'About', url: '#/about'},
             {name: 'Elg.no', url: 'http://elg.no'},
         ]
