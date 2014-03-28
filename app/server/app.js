@@ -5,6 +5,7 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var net = require('net');
 
 var os = require('os');
 var io = require('socket.io').listen(8984);
@@ -47,10 +48,29 @@ var monitor = io
                     cb(data);
                 });
             });
-            //callback(process.memoryUsage());
-            //console.log(util.inspect(process.memoryUsage()));
         });
     });
+
+var varnishSocket = new net.Socket();
+var varnish = varnishSocket.connect(6082);
+io.of('/varnish').on('connection', function (socket) {
+    var cb;
+
+    varnish.on('data', function (data) {
+        cb && cb(data.toString());
+    });
+
+    socket.on('ban', function (match, call) {
+        if (varnish._handle) {
+            cb = call;
+            varnish.write('ban ' + match + "\n", 'utf8');
+        }
+    }).on('end', function () {
+        console.log('Varnish socket disconnected. Attempting reconnect');
+        console.log('error %j', arguments);
+        varnish.connect();
+    });
+});
 
 var routes = require('./routes');
 var users = require('./routes/user');

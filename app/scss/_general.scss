@@ -15,7 +15,23 @@
 }
 
 dl {
-  dd + dt {
-    margin-top: 1em;
-  }
+    dd + dt {
+        margin-top: 1em;
+    }
+}
+
+.ban {
+    div {
+        max-width: 50%;
+
+        display: flex;
+        flex-direction: row;
+    }
+    input, button {
+        display: 1 1 auto;
+    }
+
+    input {
+        margin-right: .5em;
+    }
 }
