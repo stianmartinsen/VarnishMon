@@ -1,0 +1,7 @@
+<article ng-controller="Status" class="status">
+    <ul>
+        <li ng-repeat="server in servers" class="server">
+            {{ server.host }}:{{ server.port }} <span class="{{ server.status | lowercase }}-state"></span>
+        </li>
+    </ul>
+</article>

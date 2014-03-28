@@ -51,10 +51,53 @@ var monitor = io
         });
     });
 
-var varnishSocket = new net.Socket();
-var varnish = varnishSocket.connect(6082);
+var varnish = net.createConnection({
+    port: 6082
+});
+var ATTEMPT_RECONNECT = false;
+var broadcastState = function (state) {};
+
+var reconnect = function () {
+    var interval = setInterval(function () {
+        if (!ATTEMPT_RECONNECT) {
+            clearInterval(interval);
+        }
+
+        if (ATTEMPT_RECONNECT) {
+            console.log('Attempting reconnect');
+            varnish.connect(6082);
+        }
+    }, 100);
+};
+
+varnish
+    .on('connect', function () {
+        ATTEMPT_RECONNECT = false;
+        console.log('CONNECTED');
+        broadcastState('up');
+    })
+    .on('close', function () {
+        if (!ATTEMPT_RECONNECT) {
+            broadcastState('down');
+            ATTEMPT_RECONNECT = true;
+            reconnect();
+        }
+    })
+    .on('error', function () {
+        if (!ATTEMPT_RECONNECT) {
+            broadcastState('down');
+            ATTEMPT_RECONNECT = true;
+            reconnect();
+        }
+    })
+;
+
 io.of('/varnish').on('connection', function (socket) {
     var cb;
+
+    broadcastState = function (state) {
+        socket.emit(state);
+    };
 
     varnish.on('data', function (data) {
         cb && cb(data.toString());
@@ -65,7 +108,11 @@ io.of('/varnish').on('connection', function (socket) {
             cb = call;
             varnish.write('ban ' + match + "\n", 'utf8');
         }
-    }).on('end', function () {
+    })
+    .on('update_status', function () {
+        broadcastState(ATTEMPT_RECONNECT ? 'down' : 'up');
+    })
+    .on('end', function () {
         console.log('Varnish socket disconnected. Attempting reconnect');
         console.log('error %j', arguments);
         varnish.connect();

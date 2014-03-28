@@ -1,0 +1,32 @@
+.ok-state, .down-state, .unknown-state {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+}
+.ok-state {
+    background: green;
+    box-shadow: 0 0 2px green;
+}
+.down-state {
+    background: red;
+    box-shadow: 0 0 2px red;
+}
+.unknown-state {
+    background: #fcbe0b;
+    box-shadow: 0 0 2px #fcbe0b;
+}
+
+.status {
+    ul {
+        padding: 0;
+    }
+    .server {
+        list-style: none;
+        padding: .5em;
+        border: 1px solid #ddd;
+        background: #eee;
+        display: inline-block;
+        border-radius: 3px;
+    }
+}

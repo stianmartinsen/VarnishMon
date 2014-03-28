@@ -16,6 +16,10 @@ angular.module('varnishMonApp', [
                 templateUrl: 'views/hitmiss.html',
                 controller: 'HitMiss'
             })
+            .when('/status', {
+                templateUrl: 'views/status.html',
+                controller: 'Status'
+            })
             .when('/ban', {
                 templateUrl: 'views/ban.html',
                 controller: 'Ban'
