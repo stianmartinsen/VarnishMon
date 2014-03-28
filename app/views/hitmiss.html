@@ -1,7 +1,9 @@
-<article class="hitrate">
+<article class="hitmiss">
     <div class="range">
         <label for="hitMissRange">Time: {{ times[selectedTimeIndex].name }}</label>
         <input type=range min=0 max={{times.length-1}} id="hitMissRange" ng-model="selectedTimeIndex">
     </div>
     <span id="hitmissGaugeContainer"></span>
+
+    <div id="hitMissGraph"></div>
 </article>

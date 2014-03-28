@@ -165,7 +165,9 @@ module.exports = function (grunt) {
                     outputStyle: 'expanded',
                     sourceComments: 'map',
                     sourceMap: 'app.css.map',
-                    includePaths: ['app/bower_components/sass-bootstrap/lib/']
+                    includePaths: [
+                        'app/bower_components/sass-bootstrap/lib/'
+                    ]
                 },
                 files: {
                     'app/css/app.css': 'app/scss/app.scss'
